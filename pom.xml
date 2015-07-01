@@ -43,6 +43,18 @@
     </developer>
   </developers>
 
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/vrachieru/commit-game/issues</url>
+  </issueManagement>
+
+  <scm>
+    <connection>scm:git:git://github.com/vrachieru/commit-game.git</connection>
+    <developerConnection>scm:git:git@github.com:vrachieru/commit-game.git</developerConnection>
+    <url>https://github.com/vrachieru/commit-game</url>
+    <tag>HEAD</tag>
+  </scm>
+
   <dependencies>
     <dependency>
       <groupId>org.eclipse.jgit</groupId>
@@ -68,15 +80,17 @@
 
   <build>
     <plugins>
+      <!-- Eclipse -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-eclipse-plugin</artifactId>
         <version>2.9</version>
         <configuration>
           <downloadSources>true</downloadSources>
-          <downloadJavadocs>false</downloadJavadocs>
+          <downloadJavadocs>true</downloadJavadocs>
         </configuration>
       </plugin>
+      <!-- Compiler configuration -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -86,29 +100,50 @@
           <target>${jdk.version}</target>
         </configuration>
       </plugin>
+      <!-- Make this jar executable -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.4.1</version>
-          <configuration>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/log4j.properties</exclude>
+          </excludes>
           <archive>
             <manifest>
+              <addClasspath>true</addClasspath>
               <mainClass>com.vrachieru.commitgame.Core</mainClass>
+              <classpathPrefix>dependency-jars/</classpathPrefix>
             </manifest>
           </archive>
         </configuration>
+      </plugin>
+      <!-- Copy project dependencies -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.5.1</version>
         <executions>
           <execution>
-            <id>make-assembly</id>
-            <phase>package</phase> 
+            <id>copy-dependencies</id>
+            <phase>package</phase>
             <goals>
-              <goal>single</goal>
+              <goal>copy-dependencies</goal>
             </goals>
-          </execution>
+            <configuration>
+              <includeScope>runtime</includeScope>
+              <outputDirectory>${project.build.directory}/dependency-jars/</outputDirectory>
+              </configuration>
+            </execution>
         </executions>
+      </plugin>
+      <!-- Release into the wild -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.5.2</version>
+        <configuration>
+          <preparationGoals>clean install</preparationGoals>
+        </configuration>
       </plugin>
     </plugins>
   </build>

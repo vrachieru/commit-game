@@ -10,10 +10,10 @@ The goal is to get the longest streak! (It's harder than you think...)
 
 ## How do I play?
 
-- Clone the repo and do a clean install.
+- Clone the repo and do a clean install. Or download the [executable](../maven-repository/raw/master/releases/com/vrachieru/commit-game/1.0/commit-game-1.0.jar).
 - Fire up a terminal (Linux/OSX) or cmd (Windows)
 - Navigate to the path of a git repository
-- Execute the jar by typing: java -jar /path/to/commit-game/commit-game-[version].jar
+- Execute the jar by typing: `java -jar /path/to/commit-game-[version].jar`
 
 ## Requirements
 

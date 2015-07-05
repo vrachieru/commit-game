@@ -87,47 +87,29 @@
       <!-- Make this jar executable -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.4</version>
         <configuration>
-          <excludes>
-            <exclude>**/log4j.properties</exclude>
-          </excludes>
           <archive>
-            <manifest>
-              <addClasspath>true</addClasspath>
-              <mainClass>com.vrachieru.commitgame.Core</mainClass>
-              <classpathPrefix>dependency-jars/</classpathPrefix>
-            </manifest>
+          <manifest>
+            <mainClass>com.vrachieru.commitgame.Core</mainClass>
+          </manifest>
           </archive>
-        </configuration>
-      </plugin>
-      <!-- Copy project dependencies -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.5.1</version>
+            <descriptorRefs>
+              <descriptorRef>jar-with-dependencies</descriptorRef>
+            </descriptorRefs>
+            <!-- Override original jar as it only contains the project classes -->
+            <finalName>${project.artifactId}-${project.version}</finalName>
+            <appendAssemblyId>false</appendAssemblyId>
+          </configuration>
         <executions>
           <execution>
-            <id>copy-dependencies</id>
             <phase>package</phase>
             <goals>
-              <goal>copy-dependencies</goal>
+              <goal>single</goal>
             </goals>
-            <configuration>
-              <includeScope>runtime</includeScope>
-              <outputDirectory>${project.build.directory}/dependency-jars/</outputDirectory>
-              </configuration>
-            </execution>
+          </execution>
         </executions>
-      </plugin>
-      <!-- Release into the wild -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-        <version>2.5.2</version>
-        <configuration>
-          <preparationGoals>clean install</preparationGoals>
-        </configuration>
       </plugin>
     </plugins>
   </build>

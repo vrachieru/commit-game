@@ -47,6 +47,17 @@
     </developer>
   </developers>
 
+  <repositories>
+    <repository>
+      <id>github-vrachieru-releases</id>
+      <url>http://github.com/vrachieru/maven-repository/raw/master/releases</url>
+    </repository>
+    <repository>
+      <id>github-vrachieru-snapshots</id>
+      <url>http://github.com/vrachieru/maven-repository/raw/master/snapshots</url>
+    </repository>
+  </repositories>
+
   <issueManagement>
     <system>GitHub Issues</system>
     <url>https://github.com/vrachieru/commit-game/issues</url>

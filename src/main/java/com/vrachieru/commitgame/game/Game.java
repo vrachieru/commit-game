@@ -1,202 +1,105 @@
 package com.vrachieru.commitgame.game;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 import java.util.Scanner;
 
-import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.revwalk.RevCommit;
-
-import com.vrachieru.commitgame.utils.*;
+import com.vrachieru.commitgame.repository.GitRepository;
+import com.vrachieru.commitgame.repository.Repository;
 
 public class Game
 {
-    private static Repository repository = null;
+    private static Repository repository;
 
-    private static List<RevCommit> commits = null;
+    private static Game instance;
 
-    private static List<String> commiters = null;
+    private static GameStatus status;
 
-    private static String input = null;
+    private static GameRound round;
 
-    private static Scanner inputReader = new Scanner(System.in);
+    private static Scanner scanner;
 
-    private static int total = 0;
+    private static String input;
 
-    private static int guessed = 0;
-
-    private static int currentStreak = 0;
-
-    private static int longestStreak = 0;
-
-    /**
-     * Initialize the game
-     */
-    public static void init()
+    private Game()
     {
-        try {
-            repository = GitUtils.getRepository();
+        repository = new GitRepository();
+        status = new GameStatus();
+        round = new GameRound();
+        scanner = new Scanner(System.in);
 
-            commits = GitUtils.getCommits(repository);
-            commiters = GitUtils.getCommiters(repository);
-
-            welcome();
-        } catch (IOException e) {
-            System.out.println("The game could not be started!");
-            System.out.println("Please make sure that your current path is a repository.");
-        }
-    }
-    
-    /**
-     * Get input from the player
-     */
-    public static void getInput() {
-        input = inputReader.nextLine();
-        
-        if (input.equals("quit")){
-            System.exit(0);
-        }
+        welcome();
+        start();
     }
 
-    /**
-     * Display welcome screen
-     */
+    public static Game getInstance()
+    {
+        if (instance == null) {
+            instance = new Game();
+        }
+
+        return instance;
+    }
+
+    public static Repository getRepository()
+    {
+        return repository;
+    }
+
+    public static GameRound getRound()
+    {
+        return round;
+    }
+
     public static void welcome()
+    {
+        displayWelcomeMessage();
+
+        repository.displayInfo();
+        repository.displayCommiters();
+    }
+
+    public static void displayWelcomeMessage()
     {
         System.out.println("--------------------------------------------------------------");
         System.out.println("                      THE COMMIT GAME                         ");
         System.out.println("--------------------------------------------------------------");
         System.out.println("Welcome! The goal of this game is to guess committers based on");
         System.out.println("their commit messages.\n");
-
-        System.out.println("You're playing in a repo with " + commits.size() + " commits and " + commiters.size()
-            + " committers.\n");
-
-        showCommiters();
-        startGame();
     }
 
-    /**
-     * Show full list of commiters for the repository
-     */
-    public static void showCommiters()
+    public static void start()
     {
-        int i = 0;
-        for (String commiter : commiters) {
-            System.out.println("[" + (++i) + "] " + commiter);
-        }
+        getUserInput("Ready? PRESS ENTER TO START PLAYING (type 'q' or 'quit' to exit)\n");
+        play();
     }
 
-    /**
-     * Start the game
-     */
-    public static void startGame()
-    {
-        System.out.println("\nReady? PRESS ENTER TO START PLAYING (type 'quit' to exit)");
-
-        getInput();
-        playGame();
-    }
-
-    /**
-     * Play the game
-     */
-    public static void playGame()
+    public static void play()
     {
         while (true) {
-            System.out.println("\n----------------------------------------------------------\n");
+            round.computeNewRound();
+            round.display();
 
-            System.out.println("Playing in the " + GitUtils.getCurrentBranch(repository) + " branch.");
+            getUserInput("Choose your answer:\n> ");
 
-            System.out.println("The current streak is " + currentStreak + " with the longest streak being "
-                + longestStreak + " and an overall guess rate of " + Utils.successPercentage(guessed, total)
-                + "% (" + guessed + "/" + total + ").");
-
-            String author = getEntry();
-            String answer = getChoices(author);
-
-            System.out.print("Choose your answer:\n> ");
-            getInput();
-
-            if (answer.equals(input)) {
-                guessed++;
-                currentStreak++;
-
-                if (currentStreak > longestStreak) {
-                    longestStreak = currentStreak;
-                }
-
-                if (currentStreak == 2) {
-                    System.out.println("Two in a row! Good job!");
-                } else if (currentStreak == 3) {
-                    System.out.println("Lucky number three!");
-                } else if (currentStreak == 4) {
-                    System.out.println("You're un a roll!");
-                } else if (currentStreak == 5) {
-                    System.out.println("That's amazing!");
-                } else if (currentStreak == 6) {
-                    System.out.println("This is getting ridiculous! I'm not even counting anymore.");
-                    System.out.println("Keep up the good work!");
-                } else {
-                    System.out.println("Got it!");
-                }
+            if (round.isAnswerCorrect(input)) {
+                status.addCorrectAnswer();
             } else {
-                currentStreak = 0;
-                System.out.println("Actually it was " + author);
+                status.addIncorrectAnswer();
             }
 
-            total++;
+            status.display();
         }
     }
 
-    /**
-     * Get the choices list for each commit
-     * 
-     * @param answer the name of the author assigned to the commit
-     * @return the index of the correct answer
-     */
-    public static String getChoices(String answer)
+    private static void getUserInput(String displayMessage)
     {
-        List<String> choices = commiters;
-        choices.remove(answer);
-        Collections.shuffle(choices);
+        System.out.print(displayMessage);
 
-        choices = choices.subList(0, choices.size() > 3 ? 4 : choices.size());
-        choices.add(answer);
-        Collections.shuffle(choices);
+        input = scanner.nextLine();
 
-        for (int i = 0; i < choices.size(); i++) {
-            System.out.println("[" + (i + 1) + "] " + choices.get(i));
+        if (input.toLowerCase().startsWith("q")) {
+            scanner.close();
+            System.exit(0);
         }
-        System.out.println();
-
-        return choices.indexOf(answer) + 1 + "";
-
     }
 
-    /**
-     * Get a new random entry to feed to the player
-     * 
-     * @return the author of the commit representing the correct answer
-     */
-    public static String getEntry()
-    {
-        RevCommit commit = getRandomCommit();
-
-        System.out.println("\n(" + GitUtils.getCommitDate(commit) + ")");
-        System.out.println(GitUtils.getCommitMessage(commit));
-
-        return GitUtils.getCommitAuthor(commit);
-    }
-
-    /**
-     * Get a random commit from the list
-     * 
-     * @return raw commit
-     */
-    public static RevCommit getRandomCommit()
-    {
-        return commits.get(Utils.getRandomNumber(commits.size()));
-    }
 }

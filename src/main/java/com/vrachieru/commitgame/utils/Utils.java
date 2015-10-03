@@ -9,73 +9,82 @@ import org.joda.time.format.PeriodFormatterBuilder;
 
 public class Utils
 {
-    /**
-     * Get random number
-     * 
-     * @param max the high end of the interval
-     * @return random integer between 0 and @max
-     */
+    public static void clearConsole()
+    {
+        System.out.print("\033[H\033[2J");
+
+        try {
+            String os = System.getProperty("os.name");
+
+            if (os.contains("Windows")) {
+                Runtime.getRuntime().exec("cls");
+            } else {
+                Runtime.getRuntime().exec("clear");
+            }
+        } catch (Exception e) {
+
+        }
+    }
+
+    public static void sleep(Integer seconds)
+    {
+        try {
+            Thread.sleep(seconds * 1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
     public static int getRandomNumber(int max)
     {
         Random random = new Random();
 
-        /* return 3; // Chosen by fair dice roll. */
         return random.nextInt(max);
     }
-    
-    /**
-     * Get success percentage
-     * 
-     * @param success favorable cases
-     * @param total total cases
-     * @return success percentage rounded to 2 decimal places
-     */
-    public static double successPercentage(int success, int total) {
-        double percent = total > 0 ? (success * 100.0/total) : 0;
-        
+
+    public static double successPercentage(int success, int total)
+    {
+        double percent = total > 0 ? (success * 100.0 / total) : 0;
+
         return Math.round(percent * 100.0) / 100.0;
     }
 
-    /**
-     * Get time ago
-     * 
-     * @param timestamp number of seconds elapsed from epoch
-     * @return 
-     */
     public static String timeAgo(int timestamp)
     {
         int unitCount = 0;
+
+        String separator = " ";
 
         Period period = new Period(new DateTime(timestamp * 1000L), new DateTime());
         PeriodFormatterBuilder builder = new PeriodFormatterBuilder();
 
         if (unitCount < 2 && period.getYears() > 0) {
-            builder.appendYears().appendSuffix(" year", " years").appendSeparator(" ");
+            builder.appendYears().appendSuffix(" year", " years").appendSeparator(separator);
             unitCount++;
         }
 
         if (unitCount < 2 && period.getMonths() > 0) {
-            builder.appendMonths().appendSuffix(" month", " months").appendSeparator(" ");
+            builder.appendMonths().appendSuffix(" month", " months").appendSeparator(separator);
             unitCount++;
         }
 
         if (unitCount < 2 && period.getWeeks() > 0) {
-            builder.appendWeeks().appendSuffix(" week", " weeks").appendSeparator(" ");
+            builder.appendWeeks().appendSuffix(" week", " weeks").appendSeparator(separator);
             unitCount++;
         }
 
         if (unitCount < 2 && period.getHours() > 0) {
-            builder.appendHours().appendSuffix(" hour", " hours").appendSeparator(" ");
+            builder.appendHours().appendSuffix(" hour", " hours").appendSeparator(separator);
             unitCount++;
         }
 
         if (unitCount < 2 && period.getMinutes() > 0) {
-            builder.appendMinutes().appendSuffix(" minute", " minutes").appendSeparator(" ");
+            builder.appendMinutes().appendSuffix(" minute", " minutes").appendSeparator(separator);
             unitCount++;
         }
 
         if (unitCount < 2 && period.getSeconds() > 0) {
-            builder.appendSeconds().appendSuffix(" second", " seconds").appendSeparator(" ");
+            builder.appendSeconds().appendSuffix(" second", " seconds").appendSeparator(separator);
             unitCount++;
         }
 

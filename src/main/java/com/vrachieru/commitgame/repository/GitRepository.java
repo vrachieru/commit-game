@@ -10,83 +10,75 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 
 import com.vrachieru.commitgame.utils.Utils;
 
-public class GitRepository extends com.vrachieru.commitgame.repository.Repository
-{
-    private org.eclipse.jgit.lib.Repository repository;
+public class GitRepository extends com.vrachieru.commitgame.repository.Repository {
+  private org.eclipse.jgit.lib.Repository repository;
 
-    public GitRepository()
-    {
-        super();
+  public GitRepository() {
+    super();
 
-        this.parseRepository();
-        this.parseBranch();
-        this.parseCommitsAndCommiters();
+    this.parseRepository();
+    this.parseBranch();
+    this.parseCommitsAndCommiters();
+  }
+
+  private void parseRepository() {
+    FileRepositoryBuilder builder = new FileRepositoryBuilder();
+
+    try {
+      this.repository = builder.readEnvironment().findGitDir().build();
+    } catch (Exception ex) {
+      System.out.println("Could not determine a git repository in the current path.");
+      System.exit(1);
+    }
+  }
+
+  private void parseBranch() {
+    String branch;
+
+    try {
+      branch = this.repository.getBranch();
+    } catch (Exception e) {
+      branch = "unknown";
     }
 
-    private void parseRepository()
-    {
-        FileRepositoryBuilder builder = new FileRepositoryBuilder();
+    setBranch(branch);
+  }
 
-        try {
-            this.repository = builder.readEnvironment().findGitDir().build();
-        } catch (Exception ex) {
-            System.out.println("Could not determine a git repository in the current path.");
-            System.exit(1);
-        }
+  private void parseCommitsAndCommiters() {
+    try {
+      RevWalk revWalk = new RevWalk(repository);
+      ObjectId HEAD = this.repository.resolve("HEAD");
+      revWalk.markStart(revWalk.parseCommit(HEAD));
+
+      Iterator<RevCommit> it = revWalk.iterator();
+      while (it.hasNext()) {
+        RevCommit revCommit = it.next();
+
+        Commit commit = new Commit();
+        commit.setAuthor(getCommitAuthor(revCommit));
+        commit.setDate(getCommitDate(revCommit));
+        commit.setMessage(getCommitMessage(revCommit));
+
+        this.commits.add(commit);
+        this.commiters.add(commit.getAuthor());
+      }
+
+      revWalk.dispose();
+    } catch (Exception ex) {
+      System.out.println(ex.toString());
     }
+  }
 
-    private void parseBranch()
-    {
-        String branch;
+  private String getCommitAuthor(RevCommit commit) {
+    PersonIdent person = commit.getAuthorIdent();
+    return person.getName().trim();
+  }
 
-        try {
-            branch = this.repository.getBranch();
-        } catch (Exception e) {
-            branch = "unknown";
-        }
+  private String getCommitDate(RevCommit commit) {
+    return Utils.timeAgo(commit.getCommitTime());
+  }
 
-        setBranch(branch);
-    }
-
-    private void parseCommitsAndCommiters()
-    {
-        try {
-            RevWalk revWalk = new RevWalk(repository);
-            ObjectId HEAD = this.repository.resolve("HEAD");
-            revWalk.markStart(revWalk.parseCommit(HEAD));
-
-            Iterator<RevCommit> it = revWalk.iterator();
-            while (it.hasNext()) {
-                RevCommit revCommit = it.next();
-
-                Commit commit = new Commit();
-                commit.setAuthor(getCommitAuthor(revCommit));
-                commit.setDate(getCommitDate(revCommit));
-                commit.setMessage(getCommitMessage(revCommit));
-
-                this.commits.add(commit);
-                this.commiters.add(commit.getAuthor());
-            }
-
-            revWalk.dispose();
-        } catch (Exception ex) {
-            System.out.println(ex.toString());
-        }
-    }
-
-    private String getCommitAuthor(RevCommit commit)
-    {
-        PersonIdent person = commit.getAuthorIdent();
-        return person.getName().trim();
-    }
-
-    private String getCommitDate(RevCommit commit)
-    {
-        return Utils.timeAgo(commit.getCommitTime());
-    }
-
-    private String getCommitMessage(RevCommit commit)
-    {
-        return commit.getFullMessage();
-    }
+  private String getCommitMessage(RevCommit commit) {
+    return commit.getFullMessage();
+  }
 }

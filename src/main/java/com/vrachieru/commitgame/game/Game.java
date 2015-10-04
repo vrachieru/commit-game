@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 import com.vrachieru.commitgame.repository.GitRepository;
 import com.vrachieru.commitgame.repository.Repository;
+import com.vrachieru.commitgame.utils.Utils;
 
 public class Game {
   private static Repository repository;
@@ -60,12 +61,14 @@ public class Game {
   }
 
   public static void start() {
-    getUserInput("Ready? PRESS ENTER TO START PLAYING (type 'q' or 'quit' to exit)\n");
+    getUserInput("\nReady? PRESS ENTER TO START PLAYING (type 'q' or 'quit' to exit)\n");
     play();
   }
 
   public static void play() {
     while (true) {
+      status.displayGlobalStatus();
+
       round.computeNewRound();
       round.display();
 
@@ -77,7 +80,7 @@ public class Game {
         status.addIncorrectAnswer();
       }
 
-      status.display();
+      status.displayRoundStatus();
     }
   }
 

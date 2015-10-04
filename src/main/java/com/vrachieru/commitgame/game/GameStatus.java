@@ -20,14 +20,7 @@ public class GameStatus {
     this.longestStreak = 0;
   }
 
-  public void display() {
-    this.displayRoundStatus();
-    Utils.sleep(1);
-    Utils.clearConsole();
-    this.displayGlobalStatus();
-  }
-
-  private void displayRoundStatus() {
+  public void displayRoundStatus() {
     if (this.lastAnswerWasCorrect) {
       switch (this.currentStreak) {
         case 2:
@@ -52,9 +45,13 @@ public class GameStatus {
     } else {
       System.out.println("Actually it was " + Game.getRound().getAnswer());
     }
+
+    Utils.sleep(1);
   }
 
-  private void displayGlobalStatus() {
+  public void displayGlobalStatus() {
+    Utils.clearConsole();
+
     System.out.println("Playing in the " + Game.getRepository().getBranch() + " branch.");
     System.out.println("The current streak is " + this.getCurrentStreak()
         + " with the longest streak being " + this.getLongestStreak()

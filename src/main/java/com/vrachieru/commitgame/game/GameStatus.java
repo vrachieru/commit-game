@@ -30,7 +30,7 @@ public class GameStatus {
           System.out.println("Lucky number three!");
           break;
         case 4:
-          System.out.println("You're un a roll!");
+          System.out.println("You're on a roll!");
           break;
         case 5:
           System.out.println("That's amazing!");

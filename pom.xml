@@ -38,6 +38,7 @@
     <jdk.version>1.7</jdk.version>
     <jgit.version>3.7.1.201504261725-r</jgit.version>
     <jodatime.version>2.7</jodatime.version>
+    <junit.version>4.11</junit.version>
   </properties>
 
   <developers>
@@ -84,7 +85,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.11</version>
+      <version>${junit.version}</version>
     </dependency>
   </dependencies>
 

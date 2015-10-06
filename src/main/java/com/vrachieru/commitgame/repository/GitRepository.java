@@ -1,5 +1,6 @@
 package com.vrachieru.commitgame.repository;
 
+import java.io.File;
 import java.util.Iterator;
 
 import org.eclipse.jgit.lib.ObjectId;
@@ -14,18 +15,26 @@ public class GitRepository extends com.vrachieru.commitgame.repository.Repositor
   private org.eclipse.jgit.lib.Repository repository;
 
   public GitRepository() {
+    this(null);
+  }
+  
+  public GitRepository(File repositoryPath) {
     super();
-
-    this.parseRepository();
+    
+    this.parseRepository(repositoryPath);
     this.parseBranch();
     this.parseCommitsAndCommiters();
   }
 
-  private void parseRepository() {
+  private void parseRepository(File repositoryPath) {
     FileRepositoryBuilder builder = new FileRepositoryBuilder();
-
+    
     try {
-      this.repository = builder.readEnvironment().findGitDir().build();
+      if (repositoryPath != null) {
+        this.repository = builder.readEnvironment().findGitDir(repositoryPath).build();
+      } else {
+        this.repository = builder.readEnvironment().findGitDir().build();
+      }
     } catch (Exception ex) {
       System.out.println("Could not determine a git repository in the current path.");
       System.exit(1);

@@ -35,7 +35,7 @@ public class GitUtils {
     return repository;
   }
 
-  public static void add(File repositoryPath, String filePath, PersonIdent author,
+  public static void commit(File repositoryPath, String filePath, PersonIdent author,
       String commitMessage) throws Exception {
     File file = new File(repositoryPath.getParentFile(), filePath);
     Assert.assertTrue(FileUtils.createFile(file));

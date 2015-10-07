@@ -15,6 +15,17 @@ public class GameRound {
   private String answerKey;
 
   private List<String> choices;
+  
+  public GameRound() {
+    // nothing here
+  }
+  
+  public GameRound(Commit commit, String answer, String answerKey, List<String> choices) {
+    this.commit = commit;
+    this.answer = answer;
+    this.answerKey = answerKey;
+    this.choices = choices;
+  }
 
   public String getAnswer() {
     return this.answer;

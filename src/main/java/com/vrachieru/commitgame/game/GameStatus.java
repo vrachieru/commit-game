@@ -101,4 +101,8 @@ public class GameStatus {
 
     this.lastAnswerWasCorrect = false;
   }
+
+  public boolean isLastAnswerCorrect() {
+    return this.lastAnswerWasCorrect;
+  }
 }

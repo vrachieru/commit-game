@@ -87,7 +87,11 @@ public class Game {
   private static void getUserInput(String displayMessage) {
     System.out.print(displayMessage);
 
-    input = scanner.nextLine();
+    try {
+      input = scanner.nextLine();
+    } catch(Exception e) {
+      input = "";
+    }
 
     if (input.toLowerCase().startsWith("q")) {
       scanner.close();

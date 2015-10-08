@@ -9,14 +9,14 @@ import org.joda.time.format.PeriodFormatterBuilder;
 
 public class Utils {
   public static void clearConsole() {
-    System.out.print("\033[H\033[2J");
-
     try {
       String os = System.getProperty("os.name");
 
       if (os.contains("Windows")) {
+        System.out.println("\n--------------------------------------------------------------\n");
         Runtime.getRuntime().exec("cls");
       } else {
+        System.out.print("\033[H\033[2J");
         Runtime.getRuntime().exec("clear");
       }
     } catch (Exception e) {
